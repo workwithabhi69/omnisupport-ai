@@ -38,12 +38,19 @@ st.set_page_config(
 apply_theme()
 
 
+from backend.services.init_db import initialize_knowledge_base
+
 @st.cache_resource
 def get_backend_services():
     """Initializes and caches core ML and Database components."""
     sqlite_db = SQLiteManager()
     vector_store = VectorStoreManager()
     document_processor = DocumentProcessor()
+    
+    # Auto-initialize ChromaDB with default policy documents if empty (e.g. on cloud deployment)
+    if vector_store.get_total_chunks() == 0:
+        initialize_knowledge_base()
+
     ollama_client = OllamaClient()
     rag_pipeline = MultilingualRAGPipeline(
         vector_store=vector_store,
