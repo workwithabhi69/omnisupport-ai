@@ -107,7 +107,7 @@ def render_sidebar(
         </div>
         """)
         
-        conn_info = ollama_client.check_connection()
+              conn_info = ollama_client.check_connection()
         is_online = conn_info.get("connected", False)
         display_model = conn_info.get("model_name", "Qwen2.5 LLM")
 
