@@ -1,0 +1,18 @@
+# E-Commerce Shipping & Delivery Policy (Demo Retailer)
+# Language: English
+# Category: Shipping & Delivery
+
+## Standard Delivery Timelines
+- Standard delivery takes 3 to 5 business days for major metropolitan cities across India.
+- For non-metro cities, regional districts, and rural locations, delivery typically takes 5 to 7 business days.
+- Express delivery is available in select tier-1 cities and arrives within 24 to 48 hours for eligible orders placed before 2:00 PM.
+
+## Shipping Charges
+- Free standard shipping is provided on all orders exceeding ₹499.
+- For orders below ₹499, a nominal standard delivery charge of ₹49 is applied at checkout.
+- Express shipping carries a flat charge of ₹99 regardless of order value.
+
+## Order Tracking
+- Once your order is dispatched from our fulfillment center, you will receive an SMS and email notification containing the tracking link and courier AWB number.
+- You can also track your live package status under the "My Orders" tab on our website or mobile app.
+- Couriers make up to 3 delivery attempts before returning the package to our warehouse.

@@ -1,0 +1,25 @@
+# Core Web Framework
+streamlit>=1.35.0
+
+# NLP, Embeddings & Language Detection
+sentence-transformers>=3.0.0
+transformers>=4.40.0
+huggingface-hub<1.0,>=0.34.0
+langdetect>=1.0.9
+
+# Vector Database
+chromadb>=0.5.0
+
+# Document Ingestion (PDF, DOCX, TXT)
+pypdf>=4.0.0
+pymupdf>=1.24.0
+python-docx>=1.1.0
+
+# Data Processing & Machine Learning Evaluation
+pandas>=2.1.0
+numpy>=1.24.0
+scikit-learn>=1.4.0
+
+# HTTP & Environment Management
+requests>=2.31.0
+python-dotenv>=1.0.0

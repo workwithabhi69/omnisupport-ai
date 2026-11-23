@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Vector Store and Databases
+vector_store/
+*.db
+data/chat_history.db
+
+# Environment variables
+.env
+
+# OS-specific
+.DS_Store
+Thumbs.db

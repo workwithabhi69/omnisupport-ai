@@ -1,0 +1,19 @@
+# E-Commerce Return & Refund Policy (Demo Retailer)
+# Language: English
+# Category: Return Policies & Refund Policies
+
+## Return Window & Eligibility
+- Customers can initiate a return request within 7 calendar days from the date of package delivery.
+- To be eligible for return, the product must be unused, in its original packaging, with all security tags, user manuals, and warranty cards intact.
+- Non-returnable categories include innerwear, personal grooming items, opened cosmetics, perishable goods, and custom software.
+
+## Return Process
+- Go to "My Orders", choose the item you wish to return, select a reason, and click "Initiate Return".
+- Our courier agent will arrive to pick up the return package within 2 to 3 working days.
+- Ensure that the item is handed over in its original retail box with any accompanying accessories.
+
+## Refund Timelines & Methods
+- Once the returned package passes quality inspection at our warehouse (typically 24 to 48 hours after pickup), the refund is processed immediately.
+- For UPI and Net Banking payments: Refunds are credited to the source account within 24 to 48 hours.
+- For Credit/Debit Card payments: Refunds take 5 to 7 business days to reflect in your banking statement.
+- For Cash on Delivery (COD) orders: You can select refund via UPI transfer or instant Store Wallet credits.

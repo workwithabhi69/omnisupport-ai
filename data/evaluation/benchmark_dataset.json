@@ -1,0 +1,98 @@
+[
+  {
+    "id": "q_en_01",
+    "query": "How long does delivery take?",
+    "language": "en",
+    "expected_category": "Shipping & Delivery",
+    "expected_source": "shipping_delivery_en.txt",
+    "keywords": ["3 to 5", "business days", "delivery"]
+  },
+  {
+    "id": "q_en_02",
+    "query": "How can I return my product?",
+    "language": "en",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_en.txt",
+    "keywords": ["return", "7", "days", "My Orders"]
+  },
+  {
+    "id": "q_en_03",
+    "query": "When will I receive my refund?",
+    "language": "en",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_en.txt",
+    "keywords": ["refund", "24 to 48 hours", "UPI", "business days"]
+  },
+  {
+    "id": "q_en_04",
+    "query": "Can I cancel my order before dispatch?",
+    "language": "en",
+    "expected_category": "Payment & Cancellation",
+    "expected_source": "payments_cancellation_en.txt",
+    "keywords": ["cancel", "dispatched", "free"]
+  },
+  {
+    "id": "q_hi_01",
+    "query": "डिलीवरी में कितना समय लगता है?",
+    "language": "hi",
+    "expected_category": "Shipping & Delivery",
+    "expected_source": "shipping_delivery_hi.txt",
+    "keywords": ["3 से 5", "कार्य दिवस", "डिलीवरी"]
+  },
+  {
+    "id": "q_hi_02",
+    "query": "मैं अपना ऑर्डर कैसे वापस कर सकता हूँ?",
+    "language": "hi",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_hi.txt",
+    "keywords": ["वापसी", "7", "दिन", "मेरे ऑर्डर"]
+  },
+  {
+    "id": "q_hi_03",
+    "query": "मेरा रिफंड कब मिलेगा?",
+    "language": "hi",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_hi.txt",
+    "keywords": ["रिफंड", "24 से 48", "घंटे"]
+  },
+  {
+    "id": "q_hi_04",
+    "query": "क्या मैं ऑर्डर रद्द कर सकता हूँ?",
+    "language": "hi",
+    "expected_category": "Payment & Cancellation",
+    "expected_source": "payments_cancellation_hi.txt",
+    "keywords": ["रद्द", "डिस्पैच", "रद्दीकरण"]
+  },
+  {
+    "id": "q_mr_01",
+    "query": "डिलिव्हरीसाठी किती वेळ लागतो?",
+    "language": "mr",
+    "expected_category": "Shipping & Delivery",
+    "expected_source": "shipping_delivery_mr.txt",
+    "keywords": ["3 ते 5", "दिवस", "डिलिव्हरी"]
+  },
+  {
+    "id": "q_mr_02",
+    "query": "मी माझे उत्पादन परत कसे करू शकतो?",
+    "language": "mr",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_mr.txt",
+    "keywords": ["परत", "7", "दिवस", "माझ्या ऑर्डर्स"]
+  },
+  {
+    "id": "q_mr_03",
+    "query": "मला माझा परतावा कधी मिळेल?",
+    "language": "mr",
+    "expected_category": "Return & Refund Policies",
+    "expected_source": "returns_refunds_mr.txt",
+    "keywords": ["परतावा", "24 ते 48", "तास"]
+  },
+  {
+    "id": "q_mr_04",
+    "query": "मी माझी ऑर्डर रद्द करू शकतो का?",
+    "language": "mr",
+    "expected_category": "Payment & Cancellation",
+    "expected_source": "payments_cancellation_mr.txt",
+    "keywords": ["रद्द", "ऑर्डर", "पाठवण्यापूर्वी"]
+  }
+]

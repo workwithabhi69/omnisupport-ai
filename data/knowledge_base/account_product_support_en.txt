@@ -1,0 +1,14 @@
+# E-Commerce Account Support & Product Information Policy (Demo Retailer)
+# Language: English
+# Category: Account Support & Product Information
+
+## Account Management & Password Reset
+- To update your profile name, shipping address, or registered phone number, visit "Account Settings" from the profile icon.
+- If you forgot your account password, click "Forgot Password" on the login screen. A secure one-time password (OTP) or reset link will be sent to your registered email and phone number.
+- You can save up to 10 distinct shipping addresses in your address book for quick checkout.
+
+## Product Authenticity & Warranty
+- All electronic products, appliances, and accessories sold on our platform are 100% genuine and covered by official manufacturer warranties.
+- Warranty duration typically ranges from 6 months to 2 years depending on the brand and product category.
+- To claim a warranty service, download your official tax invoice from "My Orders" and present it at any authorized brand service center.
+- For damaged or defective products received, report within 48 hours with unboxing photos or video for immediate replacement.
