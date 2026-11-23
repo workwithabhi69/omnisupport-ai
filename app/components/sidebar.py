@@ -109,18 +109,19 @@ def render_sidebar(
         
         conn_info = ollama_client.check_connection()
         is_online = conn_info.get("connected", False)
+        display_model = conn_info.get("model_name", "Qwen2.5 LLM")
 
         if is_online:
             st.html(f"""
             <div class="status-pill online">
-                <span class="pulse-indicator"></span> Ollama Live ({ollama_client.model_name})
+                <span class="pulse-indicator"></span> {display_model} Live
             </div>
             """)
             st.html("<div style='height: 8px;'></div>")
             use_llm = st.toggle(
                 "Enable Open-Source LLM",
                 value=True,
-                help="If disabled, chatbot uses Grounded Retrieval Synthesis."
+                help="Generates grounded answers using Qwen2.5. If disabled, uses Grounded Policy Synthesis."
             )
         else:
             st.html("""

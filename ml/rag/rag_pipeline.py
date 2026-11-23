@@ -254,18 +254,16 @@ class MultilingualRAGPipeline:
         generation_mode = "retrieval_fallback"
         final_answer = ""
 
-        if use_llm and detected_lang == "en":
-            # Check Ollama health for English generation
+        if use_llm:
             conn_status = self.ollama_client.check_connection()
-            if conn_status.get("connected") and conn_status.get("model_available"):
+            if conn_status.get("connected"):
                 context_str = self._format_context(retrieved_chunks)
-                system_prompt = self.SYSTEM_PROMPTS.get("en")
+                system_prompt = self.SYSTEM_PROMPTS.get(detected_lang, self.SYSTEM_PROMPTS["en"])
                 user_prompt = (
                     f"Official Store Policy Context:\n"
                     f"{context_str}\n\n"
                     f"Customer Query: {query}\n\n"
-                    f"Provide an accurate, polite, grounded 2-3 sentence response in English based strictly on the policy above. "
-                    f"For damaged, broken, or defective items, clearly mention reporting within 48 hours to get a full replacement or refund within 5 to 7 business days:"
+                    f"Answer in 2-3 clear sentences based ONLY on the policy above:"
                 )
 
                 llm_res = self.ollama_client.generate(

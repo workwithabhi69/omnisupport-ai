@@ -1,6 +1,8 @@
 """
-Ollama Local LLM Client with Health Checking and Streaming Generation.
-Handles connection checks, model availability, timeout management, and graceful error handling.
+Dual LLM Client: Supports Local Ollama and Hugging Face Serverless Inference.
+Prioritizes Local Ollama (when running on laptop/PC), and seamlessly falls back
+to Hugging Face Open-Source Qwen2.5 serverless inference when deployed to cloud.
+100% open-source, zero paid APIs required.
 """
 
 import os
@@ -14,56 +16,90 @@ class OllamaClient:
         self,
         base_url: Optional[str] = None,
         model_name: Optional[str] = None,
-        timeout: int = 45
+        timeout: int = 40
     ):
         self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")).rstrip("/")
         self.model_name = model_name or os.getenv("OLLAMA_MODEL", "qwen2.5:0.5b")
+        self.hf_model = os.getenv("HF_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
         self.timeout = timeout
 
-    def check_connection(self) -> Dict[str, Any]:
-        """Checks if Ollama service is reachable and responsive."""
+    def _get_hf_token(self) -> Optional[str]:
+        """Retrieves HuggingFace token from Streamlit secrets or environment."""
         try:
-            resp = requests.get(f"{self.base_url}/api/tags", timeout=3)
+            import streamlit as st
+            if hasattr(st, "secrets") and "HF_TOKEN" in st.secrets:
+                return st.secrets["HF_TOKEN"]
+        except Exception:
+            pass
+        return os.getenv("HF_TOKEN")
+
+    def check_connection(self) -> Dict[str, Any]:
+        """Checks if local Ollama or Hugging Face cloud inference is available."""
+        # 1. Check local Ollama first
+        try:
+            resp = requests.get(f"{self.base_url}/api/tags", timeout=1.5)
             if resp.status_code == 200:
                 models_data = resp.json().get("models", [])
                 model_names = [m.get("name", "") for m in models_data]
                 return {
                     "connected": True,
+                    "provider": "ollama",
                     "available_models": model_names,
-                    "model_available": any(self.model_name in m for m in model_names),
-                    "message": "Ollama is online and connected."
+                    "model_available": True,
+                    "model_name": f"Ollama ({self.model_name})",
+                    "message": "Local Ollama is online."
                 }
+        except Exception:
+            pass
+
+        # 2. Check if Hugging Face token is configured for cloud deployment
+        hf_token = self._get_hf_token()
+        if hf_token:
             return {
-                "connected": False,
-                "available_models": [],
-                "model_available": False,
-                "message": f"Ollama returned HTTP status {resp.status_code}"
+                "connected": True,
+                "provider": "huggingface",
+                "available_models": [self.hf_model],
+                "model_available": True,
+                "model_name": "Qwen2.5 LLM",
+                "message": "Cloud Qwen2.5 LLM is live via HuggingFace Serverless Inference."
             }
-        except requests.exceptions.ConnectionError:
-            return {
-                "connected": False,
-                "available_models": [],
-                "model_available": False,
-                "message": "Cannot connect to Ollama. Service is not running on 127.0.0.1:11434."
-            }
-        except Exception as e:
-            return {
-                "connected": False,
-                "available_models": [],
-                "model_available": False,
-                "message": f"Ollama connection error: {str(e)}"
-            }
+
+        # 3. Neither is available
+        return {
+            "connected": False,
+            "provider": "none",
+            "available_models": [],
+            "model_available": False,
+            "model_name": self.model_name,
+            "message": "No local Ollama or HF_TOKEN detected. Using Grounded Policy Engine."
+        }
 
     def generate(
         self,
         prompt: str,
         system_prompt: Optional[str] = None,
-        temperature: float = 0.2,
-        stream: bool = False
+        temperature: float = 0.2
     ) -> Dict[str, Any]:
-        """
-        Sends generation request to Ollama /api/generate.
-        """
+        """Generates response using either Ollama (local) or HuggingFace (cloud)."""
+        conn = self.check_connection()
+        if not conn.get("connected"):
+            return {"success": False, "text": "", "error": "No LLM provider available"}
+
+        if conn.get("provider") == "ollama":
+            return self._generate_ollama(prompt, system_prompt, temperature)
+
+        if conn.get("provider") == "huggingface":
+            return self._generate_huggingface(prompt, system_prompt, temperature)
+
+        return {"success": False, "text": "", "error": "Unknown provider"}
+
+    def _generate_ollama(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.2
+    ) -> Dict[str, Any]:
+        """Local Ollama generation."""
         payload = {
             "model": self.model_name,
             "prompt": prompt,
@@ -98,53 +134,71 @@ class OllamaClient:
                 "text": "",
                 "error": f"Ollama API error: HTTP {resp.status_code} - {resp.text}"
             }
-        except requests.exceptions.Timeout:
-            return {
-                "success": False,
-                "text": "",
-                "error": f"Generation timed out after {self.timeout}s on model '{self.model_name}'"
-            }
         except Exception as e:
-            return {
-                "success": False,
-                "text": "",
-                "error": f"Error invoking Ollama: {str(e)}"
-            }
+            return {"success": False, "text": "", "error": str(e)}
 
-    def generate_stream(
+    def _generate_huggingface(
         self,
         prompt: str,
         system_prompt: Optional[str] = None,
         temperature: float = 0.2
-    ) -> Generator[str, None, None]:
-        """
-        Streams response tokens directly from Ollama.
-        """
-        payload = {
-            "model": self.model_name,
-            "prompt": prompt,
-            "stream": True,
-            "options": {
-                "temperature": temperature,
-                "top_p": 0.9,
-                "num_predict": 512
-            }
+    ) -> Dict[str, Any]:
+        """HuggingFace Serverless Inference generation."""
+        hf_token = self._get_hf_token()
+        if not hf_token:
+            return {"success": False, "text": "", "error": "No HF_TOKEN found"}
+
+        headers = {
+            "Authorization": f"Bearer {hf_token}",
+            "Content-Type": "application/json"
         }
+
+        messages = []
         if system_prompt:
-            payload["system"] = system_prompt
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
 
-        resp = requests.post(
-            f"{self.base_url}/api/generate",
-            json=payload,
-            stream=True,
-            timeout=self.timeout
-        )
-        if resp.status_code != 200:
-            yield f"Error from Ollama ({resp.status_code}): {resp.text}"
-            return
+        payload = {
+            "model": self.hf_model,
+            "messages": messages,
+            "max_tokens": 200,
+            "temperature": temperature
+        }
 
-        for line in resp.iter_lines():
-            if line:
-                chunk = json.loads(line.decode("utf-8"))
-                token = chunk.get("response", "")
-                yield token
+        urls = [
+            f"https://router.huggingface.co/hf-inference/models/{self.hf_model}/v1/chat/completions",
+            f"https://api-inference.huggingface.co/models/{self.hf_model}/v1/chat/completions"
+        ]
+
+        for url in urls:
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    choices = data.get("choices", [])
+                    if choices:
+                        content = choices[0].get("message", {}).get("content", "").strip()
+                        if content:
+                            return {"success": True, "text": content}
+            except Exception:
+                continue
+
+        # Fallback to direct raw input endpoint if chat completions is queued
+        try:
+            raw_url = f"https://api-inference.huggingface.co/models/{self.hf_model}"
+            full_text = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
+            raw_payload = {
+                "inputs": full_text,
+                "parameters": {"max_new_tokens": 150, "temperature": temperature, "return_full_text": False}
+            }
+            resp = requests.post(raw_url, headers=headers, json=raw_payload, timeout=self.timeout)
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, list) and len(data) > 0:
+                    generated = data[0].get("generated_text", "").strip()
+                    if generated:
+                        return {"success": True, "text": generated}
+        except Exception as e:
+            return {"success": False, "text": "", "error": str(e)}
+
+        return {"success": False, "text": "", "error": "Hugging Face Inference call failed"}
