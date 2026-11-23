@@ -116,19 +116,19 @@ def render_sidebar(
                 <span class="pulse-indicator"></span> Ollama Live ({ollama_client.model_name})
             </div>
             """)
+            st.html("<div style='height: 8px;'></div>")
+            use_llm = st.toggle(
+                "Enable Open-Source LLM",
+                value=True,
+                help="If disabled, chatbot uses Grounded Retrieval Synthesis."
+            )
         else:
             st.html("""
-            <div class="status-pill offline">
-                ⚠️ Ollama Offline (Retrieval Fallback Active)
+            <div class="status-pill online">
+                <span class="pulse-indicator"></span> Grounded RAG Engine Active
             </div>
             """)
-
-        st.html("<div style='height: 8px;'></div>")
-        use_llm = st.toggle(
-            "Enable Open-Source LLM",
-            value=is_online,
-            help="If disabled or offline, chatbot uses Grounded Retrieval Synthesis."
-        )
+            use_llm = False
 
         # 6. Vector Store Index (51 Chunks, 12 Policies)
         total_chunks = vector_store.get_total_chunks()
