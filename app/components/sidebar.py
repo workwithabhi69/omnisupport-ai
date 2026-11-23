@@ -100,14 +100,14 @@ def render_sidebar(
 
         st.markdown("---")
 
-        # 5. Ollama Status & Open-Source LLM Engine
+        # 5. Model & System Health
         st.html("""
         <div class="sidebar-section-title">
             <span>⚡</span> AI Engine & Health
         </div>
         """)
-        
-              conn_info = ollama_client.check_connection()
+
+        conn_info = ollama_client.check_connection()
         is_online = conn_info.get("connected", False)
         display_model = conn_info.get("model_name", "Qwen2.5 LLM")
 
