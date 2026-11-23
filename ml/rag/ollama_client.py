@@ -1,7 +1,5 @@
 """
 Dual LLM Client: Supports Local Ollama and Hugging Face Serverless Inference.
-Prioritizes Local Ollama (when running on laptop/PC), and seamlessly falls back
-to Hugging Face Open-Source Qwen2.5 serverless inference when deployed to cloud.
 100% open-source, zero paid APIs required.
 """
 
@@ -35,7 +33,6 @@ class OllamaClient:
 
     def check_connection(self) -> Dict[str, Any]:
         """Checks if local Ollama or Hugging Face cloud inference is available."""
-        # 1. Check local Ollama first
         try:
             resp = requests.get(f"{self.base_url}/api/tags", timeout=1.5)
             if resp.status_code == 200:
@@ -52,7 +49,6 @@ class OllamaClient:
         except Exception:
             pass
 
-        # 2. Check if Hugging Face token is configured for cloud deployment
         hf_token = self._get_hf_token()
         if hf_token:
             return {
@@ -64,14 +60,13 @@ class OllamaClient:
                 "message": "Cloud Qwen2.5 LLM is live via HuggingFace Serverless Inference."
             }
 
-        # 3. Neither is available
         return {
             "connected": False,
             "provider": "none",
             "available_models": [],
             "model_available": False,
             "model_name": self.model_name,
-            "message": "No local Ollama or HF_TOKEN detected. Using Grounded Policy Engine."
+            "message": "Using Grounded Policy Engine."
         }
 
     def generate(
@@ -80,7 +75,6 @@ class OllamaClient:
         system_prompt: Optional[str] = None,
         temperature: float = 0.2
     ) -> Dict[str, Any]:
-        """Generates response using either Ollama (local) or HuggingFace (cloud)."""
         conn = self.check_connection()
         if not conn.get("connected"):
             return {"success": False, "text": "", "error": "No LLM provider available"}
@@ -99,7 +93,6 @@ class OllamaClient:
         system_prompt: Optional[str] = None,
         temperature: float = 0.2
     ) -> Dict[str, Any]:
-        """Local Ollama generation."""
         payload = {
             "model": self.model_name,
             "prompt": prompt,
@@ -116,11 +109,7 @@ class OllamaClient:
             payload["system"] = system_prompt
 
         try:
-            resp = requests.post(
-                f"{self.base_url}/api/generate",
-                json=payload,
-                timeout=self.timeout
-            )
+            resp = requests.post(f"{self.base_url}/api/generate", json=payload, timeout=self.timeout)
             if resp.status_code == 200:
                 data = resp.json()
                 return {
@@ -129,11 +118,7 @@ class OllamaClient:
                     "total_duration": data.get("total_duration", 0),
                     "eval_count": data.get("eval_count", 0)
                 }
-            return {
-                "success": False,
-                "text": "",
-                "error": f"Ollama API error: HTTP {resp.status_code} - {resp.text}"
-            }
+            return {"success": False, "text": "", "error": resp.text}
         except Exception as e:
             return {"success": False, "text": "", "error": str(e)}
 
@@ -143,7 +128,6 @@ class OllamaClient:
         system_prompt: Optional[str] = None,
         temperature: float = 0.2
     ) -> Dict[str, Any]:
-        """HuggingFace Serverless Inference generation."""
         hf_token = self._get_hf_token()
         if not hf_token:
             return {"success": False, "text": "", "error": "No HF_TOKEN found"}
@@ -183,7 +167,6 @@ class OllamaClient:
             except Exception:
                 continue
 
-        # Fallback to direct raw input endpoint if chat completions is queued
         try:
             raw_url = f"https://api-inference.huggingface.co/models/{self.hf_model}"
             full_text = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
