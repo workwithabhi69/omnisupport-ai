@@ -36,9 +36,12 @@ st.set_page_config(
 
 # Apply CSS Theme
 apply_theme()
-# Propagate HuggingFace Token from Streamlit Secrets to Environment
-if hasattr(st, "secrets") and "HF_TOKEN" in st.secrets:
-    os.environ["HF_TOKEN"] = str(st.secrets["HF_TOKEN"]).strip()
+# Propagate HuggingFace Token from Streamlit Secrets to Environment safely
+try:
+    if hasattr(st, "secrets") and "HF_TOKEN" in st.secrets:
+        os.environ["HF_TOKEN"] = str(st.secrets["HF_TOKEN"]).strip()
+except Exception:
+    pass
 
 from backend.services.init_db import initialize_knowledge_base
 
